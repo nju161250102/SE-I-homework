@@ -15,9 +15,9 @@ import java.util.List;
 
 public class ServerThread extends Thread {
 	private static ArrayList<String> userList = new ArrayList<String>();
-	static int count = 0;
+	private static int count = 0;
 	
-	Socket s = null;
+	private Socket s;
 	private PrintWriter out;
 	private String user = "";
 	private String lineSeparator = System.lineSeparator();
@@ -80,7 +80,7 @@ public class ServerThread extends Thread {
 	}
 	
 	//compile
-	private String compileBF(String s, String input, int plusNum, int subNum) throws Exception {
+	private String compileBF(String s, String input){
 		//Machine initialize
 		String output = "";
 		char[] cell = new char[1025];
@@ -101,11 +101,11 @@ public class ServerThread extends Thread {
 			else if (c == '[') {
 				if (cell[pointer] == 0) {
 					int n = 0;
-					loop: while(true) {
+					while(true) {
 						i ++;
 						if (s.charAt(i) == '[') n++;
 						if (s.charAt(i) == ']') {
-							if (n == 0) break loop;
+							if (n == 0) break;
 							else n --;
 						}
 					};
@@ -114,11 +114,11 @@ public class ServerThread extends Thread {
 			else if (c == ']') {
 				if (cell[pointer] != 0) {
 					int n = 0;
-					loop: while(true) {
+					while(true) {
 						i --;
 						if (s.charAt(i) == ']') n++;
 						if (s.charAt(i) == '[') {
-							if (n == 0) break loop;
+							if (n == 0) break;
 							else n --;
 						}
 					};
@@ -143,7 +143,7 @@ public class ServerThread extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		String line = null;
+		String line;
 		String input = "";
 		
 		try {
@@ -187,7 +187,7 @@ public class ServerThread extends Thread {
 					File newFile = new File("./" + user + "_" + sdf.format(date) + "01_" + line);
 					if (newFile.createNewFile()) {
 						print("Build " + newFile.getName());
-						sendToClient(line + "built succeed");
+						//sendToClient(line + "built succeed");
 					}
 				}
 				
@@ -295,7 +295,7 @@ public class ServerThread extends Thread {
 					else if (num[2] > num[3]) sendToClient("Error: ']' not found");
 					else {
 						try {
-							sendToClient("Output:" + compileBF(code, input, num[0], num[1]));
+							sendToClient("Output:" + compileBF(code, input));
 						} catch (Exception e) {
 							e.printStackTrace();
 							sendToClient("Error: Unkown Error in Code.");

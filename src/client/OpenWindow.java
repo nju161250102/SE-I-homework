@@ -6,8 +6,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -22,13 +20,11 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 @SuppressWarnings("serial")
 public class OpenWindow extends JFrame {
 	private ClientWindow window;
-	private Set<String> fileNameSet = new HashSet<String>();
+	private Set<String> fileNameSet = new HashSet<>();
 	private boolean lock = true; // true is open; false is new
 	@SuppressWarnings("rawtypes")
 	private JList list = new JList();
@@ -90,36 +86,28 @@ public class OpenWindow extends JFrame {
 				setVisible(false);
 			}   
 		});
-		list.addListSelectionListener(new ListSelectionListener(){
-			@Override
-			public void valueChanged(ListSelectionEvent arg0) {
-				textField.setText((String) list.getSelectedValue());
-			}
-		});
-		button.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					if (lock) {  // New operation
-						if (fileNameSet.contains(textField.getText())) {
-							textField.setText("Name Existed");
-						}
-						else {
-							window.terminal.send("New", textField.getText() + comboBox.getSelectedItem());
-							window.openSuccess(textField.getText() + comboBox.getSelectedItem());
-						}
+		list.addListSelectionListener(l -> textField.setText((String) list.getSelectedValue()));
+		button.addActionListener(l -> {
+			try {
+				if (lock) {  // New operation
+					if (fileNameSet.contains(textField.getText())) {
+						textField.setText("Name Existed");
 					}
 					else {
-						window.terminal.send("Open", textField.getText());
-						window.setContent(window.terminal.get());
-						window.openSuccess(textField.getText());
+						window.terminal.send("New", textField.getText() + comboBox.getSelectedItem());
+						window.openSuccess(textField.getText() + comboBox.getSelectedItem());
 					}
-					
-				}catch(IOException e1) {
-					e1.printStackTrace();
 				}
-				setVisible(false);
-			}	
+				else {
+					window.terminal.send("Open", textField.getText());
+					window.setContent(window.terminal.get());
+					window.openSuccess(textField.getText());
+				}
+
+			}catch(IOException e1) {
+				e1.printStackTrace();
+			}
+			setVisible(false);
 		});
 		
 	}

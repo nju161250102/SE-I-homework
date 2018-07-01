@@ -12,16 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class ClientWindow extends JFrame {
@@ -53,11 +44,11 @@ public class ClientWindow extends JFrame {
 	//two child windows
 	private LogWindow logWindow = new LogWindow(this);
 	private OpenWindow openWindow = new OpenWindow(this);
-	ClientTerminal terminal = new ClientTerminal();
-	protected String name = ""; // the name of user
+	protected ClientTerminal terminal = new ClientTerminal();
+	private String name = ""; // the name of user
 	//get and set
-	public String getInput() { return inputArea.getText();}
-	public String getData() {return dataInput.getText();}
+	private String getInput() { return inputArea.getText();}
+	private String getData() {return dataInput.getText();}
 	public void setContent(String s) {inputArea.setText(s);}
 	public void setInfo(String s) {bottomLabel.setText(s);}
 	//file opened successfully
@@ -70,8 +61,8 @@ public class ClientWindow extends JFrame {
 		menuFileSave.setEnabled(true);
 	}
 	//set the Version Menu
-	protected void setVersion() {
-		String str = null;
+	private void setVersion() {
+		String str;
 		String[] list = null;
 		try {
 			terminal.send("Version", name);
@@ -87,7 +78,7 @@ public class ClientWindow extends JFrame {
 		for (int i = list.length; i < 5; i ++) menuVersion.remove(menuVersionItem[i]);
 	}
 	//
-	ClientWindow() {
+	public ClientWindow() {
 		super("编译器客户端");
 		
 		//size and location
@@ -97,7 +88,7 @@ public class ClientWindow extends JFrame {
 		setResizable(false);
 		
 		//close button and layout
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		Container c = getContentPane();
 		c.setLayout(new BorderLayout());
 		c.setBackground(Color.white);
@@ -151,8 +142,8 @@ public class ClientWindow extends JFrame {
 		add(bottomPanel, BorderLayout.SOUTH);
 		
 		//Menu Action Listener
-		addWindowListener(new WindowAdapter(){ 
-			public void windowClosing(WindowEvent e){ 
+		addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
 				try {
 					if (menuLogOut.isEnabled()) terminal.send("close", "");
 					System.exit(0);
@@ -160,89 +151,59 @@ public class ClientWindow extends JFrame {
 					e1.printStackTrace();
 				}
 				setVisible(false);
-			}   
-		}); 
-		menuFileNew.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				openWindow.setWindow("New");
 			}
 		});
-		menuFileOpen.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				openWindow.setWindow("Open");
+		menuFileNew.addActionListener(l -> openWindow.setWindow("New"));
+		menuFileOpen.addActionListener(l-> openWindow.setWindow("Open"));
+		menuFileSave.addActionListener(l ->{
+			try {
+				terminal.send("Save", name + System.lineSeparator() + getInput());
+				setInfo(name + terminal.get());
+				setVersion();
+			} catch (IOException e1) {
+				setInfo("Wrong: Save Failed");
 			}
 		});
-		menuFileSave.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					terminal.send("Save", name + System.lineSeparator() + getInput());
-					setInfo(name + terminal.get());
-					setVersion();
-				} catch (IOException e1) {
-					setInfo("Wrong: Save Failed");
-				}
+		menuFileExit.addActionListener(e -> {
+			try {
+				terminal.send("close", "");
+			} catch (IOException e1) {
+				setInfo("Wrong: Log Out Failed");
 			}
+			System.exit(1);
 		});
-		menuFileExit.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					terminal.send("close", "");
-				} catch (IOException e1) {
-					setInfo("Wrong: Log Out Failed");
-				}
-				System.exit(1);
-			}
-		});
-		menuEditRun.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					terminal.send("Run", getData() + System.lineSeparator() + name + System.lineSeparator() + getInput());
-					String[] s = terminal.get().split(":");
-					
-					if ("Error".equals(s[0])) setInfo("Error : " + s[1]);
-					else if ("Output".equals(s[0])) setInfo("The output:  " + s[1]);
-				} catch (IOException e) {
-					setInfo("Wrong: May Not Connected to server.Server");
-				}
+		menuEditRun.addActionListener(l -> {
+			try {
+				terminal.send("Run", getData() + System.lineSeparator() + name + System.lineSeparator() + getInput());
+				String[] s = terminal.get().split(":");
+
+				if ("Error".equals(s[0])) setInfo("Error : " + s[1]);
+				else if ("Output".equals(s[0])) setInfo("The output:  " + s[1]);
+			} catch (IOException e) {
+				setInfo("Wrong: May Not Connected to server.Server");
 			}
 			
 		});
-		for (int i = 0; i < menuVersionItem.length; i ++) {
-			menuVersionItem[i].addActionListener(new ActionListener(){
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					try {
-						terminal.send("OpenByVersion", e.getActionCommand() + "_" + name);
-						setContent(terminal.get());
-						setInfo("VersionID: " + e.getActionCommand());
-					} catch (IOException e1) {
-						setInfo("Wrong: Not connected to server.Server");
-					}
+		for (JMenuItem item : menuVersionItem) {
+			item.addActionListener(e -> {
+				try {
+					terminal.send("OpenByVersion", e.getActionCommand() + "_" + name);
+					setContent(terminal.get());
+					setInfo("VersionID: " + e.getActionCommand());
+				} catch (IOException e1) {
+					setInfo("Wrong: Not connected to server.Server");
 				}
 			});
 		}
-		menuLogIn.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				logWindow.setVisible(true);
+		menuLogIn.addActionListener(l -> logWindow.setVisible(true));
+		menuLogOut.addActionListener(l -> {
+			try {
+				terminal.close();
+			} catch (IOException e) {
+				setInfo("Wrong: Log Out Failed");
 			}
-		});
-		menuLogOut.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					terminal.close();
-				} catch (IOException e1) {
-					setInfo("Wrong: Log Out Failed");
-				}
-				lockMenu(false);		
-				menuFileSave.setEnabled(false);
-			}
+			lockMenu(false);
+			menuFileSave.setEnabled(false);
 		});
 		lockMenu(false);
 		
@@ -250,14 +211,13 @@ public class ClientWindow extends JFrame {
 		setVisible(true);
 	}
 	
-	public void lockMenu(boolean b) {
+	protected void lockMenu(boolean b) {
 		menuVersion.setEnabled(b);
 		menuFileNew.setEnabled(b);
 		menuFileOpen.setEnabled(b);
 		menuLogIn.setEnabled(!b);
 		menuLogOut.setEnabled(b);
 	}
-	//
 	
 	public static void main(String[] args) {
 		new ClientWindow();

@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -57,35 +55,27 @@ public class LogWindow extends JFrame {
 		add(buttonB);
 		
 		//Listener
-		addWindowListener(new WindowAdapter(){ 
-			public void windowClosing(WindowEvent e){   
-				setVisible(false);
-			}   
-		});
-		buttonA.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (window.terminal.connect(textA.getText(), 10080, textB.getText())) {
-					try {
-						if ("succeed".equals(window.terminal.get())) {
-							System.out.println("chenggong");
-							window.setInfo("Welcome! " + textB.getText());
-							window.lockMenu(true);
-						}
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				}
-				else window.setInfo("server.Server Connection Error!");
+		addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
 				setVisible(false);
 			}
 		});
-		buttonB.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-			}	
+		buttonA.addActionListener(l -> {
+			if (window.terminal.connect(textA.getText(), 10080, textB.getText())) {
+				try {
+					if ("succeed".equals(window.terminal.get())) {
+						System.out.println("chenggong");
+						window.setInfo("Welcome! " + textB.getText());
+						window.lockMenu(true);
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			else window.setInfo("server.Server Connection Error!");
+			setVisible(false);
 		});
+		buttonB.addActionListener(l -> setVisible(false));
 	}
 	
 }
