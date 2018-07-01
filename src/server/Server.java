@@ -1,3 +1,5 @@
+package server;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,13 +10,13 @@ public class Server {
 
 		try { 
 			ServerSocket serverSocket = new ServerSocket(10080); 
-			System.out.println("Server Running ......");
+			System.out.println("server.Server Running ......");
 		    Socket socket = null;  
 		     
 		    while (true){  
 		        socket = serverSocket.accept();  
 		        ServerThread serverThread = new ServerThread(socket); 
-		        //System.out.println("The Number of Clients: " + ServerThread.count); 
+		        //System.out.println("The Number of Clients: " + server.ServerThread.count);
 		        serverThread.start(); 
 		    } 
 		} catch (IOException e) { 

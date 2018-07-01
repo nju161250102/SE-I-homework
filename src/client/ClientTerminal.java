@@ -1,3 +1,5 @@
+package client;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,7 +23,7 @@ public class ClientTerminal {
 		}
 	}
 	
-	//send information to Server, use "over" as end
+	//send information to server.Server, use "over" as end
 	void send(String command, String s) throws IOException {
 		BufferedReader bufr = new BufferedReader(new StringReader(s));
 		out = new PrintWriter(client.getOutputStream(),true);
@@ -33,7 +35,7 @@ public class ClientTerminal {
 		out.println("over");	
 	}
 	
-	//get information from Server, use "over" as end, including line separator
+	//get information from server.Server, use "over" as end, including line separator
 	String get() throws IOException {
 		BufferedReader bufrIn =new BufferedReader(new InputStreamReader(client.getInputStream()));
 		String line = null;
@@ -45,7 +47,7 @@ public class ClientTerminal {
 		return output;
 	}
 	
-	//close the connection to Server
+	//close the connection to server.Server
 	void close() throws IOException {
 		client.close();
 	}

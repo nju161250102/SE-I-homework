@@ -1,3 +1,5 @@
+package client;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -74,7 +76,7 @@ public class LogWindow extends JFrame {
 						e1.printStackTrace();
 					}
 				}
-				else window.setInfo("Server Connection Error!");
+				else window.setInfo("server.Server Connection Error!");
 				setVisible(false);
 			}
 		});

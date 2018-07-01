@@ -1,3 +1,5 @@
+package client;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -205,7 +207,7 @@ public class ClientWindow extends JFrame {
 					if ("Error".equals(s[0])) setInfo("Error : " + s[1]);
 					else if ("Output".equals(s[0])) setInfo("The output:  " + s[1]);
 				} catch (IOException e) {
-					setInfo("Wrong: May Not Connected to Server");
+					setInfo("Wrong: May Not Connected to server.Server");
 				}
 			}
 			
@@ -219,7 +221,7 @@ public class ClientWindow extends JFrame {
 						setContent(terminal.get());
 						setInfo("VersionID: " + e.getActionCommand());
 					} catch (IOException e1) {
-						setInfo("Wrong: Not connected to Server");
+						setInfo("Wrong: Not connected to server.Server");
 					}
 				}
 			});
